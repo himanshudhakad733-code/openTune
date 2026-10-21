@@ -1,5 +1,7 @@
 # 🎧 OpenTune
 
+The **HD** badge beside the logo represents creator **Himanshu Dhakad's initials**; it does not describe audio quality.
+
 ### A YouTube Music-style open-source music player — without the clutter.
 
 **OpenTune** is an open-source web music client built by **[@harshitethic](https://github.com/harshitethic)**.
@@ -30,10 +32,9 @@ It is designed to feel familiar to YouTube Music while using a custom **OpenTune
 - Up Next queue
 
 ### 🧠 Discovery & recommendations
-- Recommendation section
+- Homepage recommendations loaded from the public music catalog
 - Queue-based listening
 - Recently played history
-- Personalized recommendations when an OpenTune account is enabled
 
 ### ❤️ Personal library
 - Like songs
@@ -70,13 +71,12 @@ This is a simple local account system intended for the OpenTune project.
 
 ## 🎨 Design
 
-OpenTune is styled around the **@harshitethic** portfolio aesthetic:
+OpenTune uses an original, premium navy-dark interface with blue, purple, and pink accents:
 
-- Deep green / black interface
-- Neon mint accents
-- Minimal typography
-- Technical / developer-inspired UI
-- YouTube Music-inspired information architecture
+- Responsive navigation and music cards for phones, laptops, and desktops
+- Featured recommended track and the creator's gold square HD initials badge
+- Persistent player, compact mobile controls, and an accessible search flow
+- Independent OpenTune branding; OpenTune is not an official YouTube product
 
 ---
 
@@ -226,6 +226,17 @@ OpenTune is designed to run without paid APIs.
 There is no Google/YouTube API key required for the core music search.
 
 The project uses the public functionality exposed through the open-source `ytmusicapi` ecosystem.
+
+### Existing Render service
+
+To publish this update to the Render web service already connected to the project repository:
+
+1. Push the updated files to the branch configured in that Render service.
+2. In Render, confirm the service uses `pip install -r requirements.txt` as its build command and `python app.py` as its start command.
+3. Trigger **Manual Deploy → Deploy latest commit** if automatic deploys are disabled.
+4. Keep the service's existing environment variables and database/persistent-storage setup unchanged.
+
+The server listens on Render's `PORT` environment variable automatically. Do not create a replacement service if you want to keep the existing deployment and its configuration.
 
 ---
 
