@@ -136,13 +136,8 @@ def search_music(query):
         vid=x.get("videoId")
         if not vid: continue
         artists=x.get("artists") or []
-        album = x.get("album") or {}
-        result.append({"videoId":vid,"title":x.get("title") or "Unknown","artist":", ".join(a.get("name","") for a in artists),"album":album.get("name",""),"duration":x.get("duration",""),"thumbnail":(x.get("thumbnails") or [{}])[-1].get("url","")})
+        result.append({"videoId":vid,"title":x.get("title") or "Unknown","artist":", ".join(a.get("name","") for a in artists),"duration":x.get("duration",""),"thumbnail":(x.get("thumbnails") or [{}])[-1].get("url","")})
     return result
-
-
-def recommended_music():
-    return search_music("popular songs")
 
 
 def main():
@@ -161,8 +156,6 @@ def main():
                     if not query: return send_json(self,{"results":[]})
                     if len(query) > 200: return send_json(self,{"error":"Search query is too long."},400)
                     return send_json(self,{"results":search_music(query)})
-                if p.path=="/api/recommendations":
-                    return send_json(self,{"results":recommended_music()})
                 if p.path=="/api/auth/me":
                     u=user_from_token(self.headers.get("Authorization","").removeprefix("Bearer "))
                     return send_json(self,{"user":dict(u) if u else None})
@@ -230,7 +223,7 @@ def main():
                 traceback.print_exc(); send_json(self,{"error":"Internal server error"},500)
 
     server=ThreadingHTTPServer(("0.0.0.0",PORT),Handler)
-    print(f"OpenTune HD -> http://localhost:{PORT}")
+    print(f"OpenTune -> http://localhost:{PORT}")
     print("Catalog -> ytmusicapi (unauthenticated YouTube Music public search)")
     server.serve_forever()
 
