@@ -1,0 +1,830 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#09090c">
+    <title>OpenTune — Music for every mood</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <style>
+        :root {
+            color-scheme: dark;
+            --bg: #09090c;
+            --panel: #111116;
+            --panel-raised: #18181f;
+            --panel-hover: #202029;
+            --line: #282832;
+            --text: #f5f3f7;
+            --muted: #aaa8b4;
+            --subtle: #74727f;
+            --accent: #c6fa54;
+            --accent-ink: #10150a;
+            --purple: #a98bfa;
+            --radius: 16px;
+        }
+
+        * { box-sizing: border-box; }
+        html { min-width: 320px; scroll-behavior: smooth; }
+        body {
+            min-width: 320px;
+            min-height: 100vh;
+            margin: 0;
+            padding-bottom: 100px;
+            background: var(--bg);
+            color: var(--text);
+            font-family: "DM Sans", system-ui, sans-serif;
+        }
+        button, input { font: inherit; }
+        button { color: inherit; cursor: pointer; }
+        button:focus-visible, input:focus-visible, a:focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 3px;
+        }
+
+        .app {
+            display: grid;
+            grid-template-columns: 242px minmax(0, 1fr);
+            min-height: 100vh;
+            padding-bottom: 184px;
+        }
+        .side {
+            position: sticky;
+            top: 0;
+            height: calc(100vh - 174px);
+            overflow-y: auto;
+            padding: 26px 16px;
+            border-right: 1px solid var(--line);
+            background: #0d0d11;
+        }
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 4px 6px 34px;
+        }
+        .mark {
+            display: grid;
+            width: 42px;
+            height: 42px;
+            place-items: center;
+            border-radius: 14px;
+            background: linear-gradient(145deg, #ddff83, #8fd524);
+            color: var(--accent-ink);
+            font-family: Manrope, sans-serif;
+            font-size: 15px;
+            font-weight: 800;
+            box-shadow: 0 6px 24px #b7f53d2b;
+        }
+        .brand-name {
+            font-family: Manrope, sans-serif;
+            font-size: 17px;
+            font-weight: 800;
+            letter-spacing: .08em;
+        }
+        .brand-caption {
+            display: block;
+            margin-top: 3px;
+            color: var(--accent);
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: .045em;
+        }
+        .nav-label, .eyebrow {
+            color: var(--subtle);
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .17em;
+            text-transform: uppercase;
+        }
+        .nav-label { margin: 24px 12px 9px; }
+        .nav { display: grid; gap: 5px; }
+        .nav button {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            width: 100%;
+            min-height: 46px;
+            padding: 0 13px;
+            border: 0;
+            border-radius: 11px;
+            background: transparent;
+            color: var(--muted);
+            text-align: left;
+            transition: background .18s ease, color .18s ease, transform .18s ease;
+        }
+        .nav button:hover { background: var(--panel-hover); color: var(--text); }
+        .nav button:active { transform: scale(.98); }
+        .nav button.active { background: #20231a; color: var(--accent); }
+        .nav-icon { width: 20px; font-size: 18px; text-align: center; }
+        .side-note {
+            margin: 34px 6px 0;
+            padding: 15px;
+            border: 1px solid var(--line);
+            border-radius: 13px;
+            background: linear-gradient(140deg, #19191f, #101014);
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.6;
+        }
+        .side-note strong { display: block; margin-bottom: 5px; color: var(--text); }
+
+        .main { min-width: 0; }
+        .top {
+            position: sticky;
+            top: 0;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            height: 76px;
+            padding: 0 30px;
+            border-bottom: 1px solid #ffffff0c;
+            background: #09090ceF;
+            backdrop-filter: blur(18px);
+        }
+        .history-controls { display: flex; gap: 8px; }
+        .round-btn {
+            display: grid;
+            width: 36px;
+            height: 36px;
+            place-items: center;
+            border: 1px solid var(--line);
+            border-radius: 50%;
+            background: var(--panel);
+            color: var(--muted);
+        }
+        .round-btn:hover { color: var(--text); background: var(--panel-hover); }
+        .search-wrap { position: relative; flex: 1; max-width: 580px; }
+        .search-icon {
+            position: absolute;
+            top: 50%;
+            left: 16px;
+            color: var(--muted);
+            font-size: 17px;
+            pointer-events: none;
+            transform: translateY(-50%);
+        }
+        .search {
+            width: 100%;
+            height: 44px;
+            padding: 0 48px 0 44px;
+            border: 1px solid transparent;
+            border-radius: 24px;
+            outline: none;
+            background: #1b1b22;
+            color: var(--text);
+            transition: border-color .2s, background .2s;
+        }
+        .search::placeholder { color: #8e8c98; }
+        .search:focus { border-color: #c6fa5466; background: #202028; }
+        .search-action {
+            position: absolute;
+            top: 4px;
+            right: 5px;
+            height: 36px;
+            padding: 0 13px;
+            border: 0;
+            border-radius: 20px;
+            background: var(--accent);
+            color: var(--accent-ink);
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .signin {
+            flex: 0 0 auto;
+            margin-left: auto;
+            padding: 10px 17px;
+            border: 1px solid #ffffff24;
+            border-radius: 22px;
+            background: transparent;
+            color: var(--text);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: .04em;
+            transition: background .2s, border-color .2s;
+        }
+        .signin:hover { border-color: var(--text); background: #ffffff0a; }
+
+        .content { max-width: 1120px; margin: auto; padding: 32px 34px 56px; }
+        .hero {
+            position: relative;
+            overflow: hidden;
+            min-height: 250px;
+            padding: clamp(28px, 5vw, 52px);
+            border: 1px solid #ffffff12;
+            border-radius: 22px;
+            background:
+                radial-gradient(ellipse at 86% 8%, #b4e94e35, transparent 33%),
+                radial-gradient(ellipse at 100% 100%, #9672dc38, transparent 36%),
+                linear-gradient(115deg, #20211b 0%, #17171d 48%, #13121a 100%);
+        }
+        .hero::after {
+            position: absolute;
+            right: 5%;
+            bottom: -105px;
+            width: 250px;
+            height: 250px;
+            border: 1px solid #ffffff12;
+            border-radius: 50%;
+            box-shadow: 0 0 0 24px #ffffff06, 0 0 0 50px #ffffff04;
+            content: "";
+            pointer-events: none;
+        }
+        .hero .eyebrow { color: var(--accent); }
+        .hero h1 {
+            position: relative;
+            z-index: 1;
+            max-width: 640px;
+            margin: 18px 0 12px;
+            font-family: Manrope, sans-serif;
+            font-size: clamp(34px, 5vw, 58px);
+            font-weight: 800;
+            letter-spacing: -.055em;
+            line-height: 1.05;
+        }
+        .hero p { position: relative; z-index: 1; max-width: 550px; margin: 0; color: #c2c0c9; line-height: 1.65; }
+        .hero-cta {
+            position: relative;
+            z-index: 1;
+            margin-top: 24px;
+            padding: 11px 18px;
+            border: 0;
+            border-radius: 24px;
+            background: var(--accent);
+            color: var(--accent-ink);
+            font-size: 13px;
+            font-weight: 800;
+            transition: transform .2s, box-shadow .2s;
+        }
+        .hero-cta:hover { transform: translateY(-2px); box-shadow: 0 7px 22px #c6fa5430; }
+
+        .section { margin-top: 34px; scroll-margin-top: 95px; }
+        .section-head { display: flex; align-items: end; justify-content: space-between; gap: 12px; margin-bottom: 15px; }
+        .section-head h2 {
+            margin: 0;
+            font-family: Manrope, sans-serif;
+            font-size: clamp(19px, 2.4vw, 24px);
+            font-weight: 800;
+            letter-spacing: -.035em;
+        }
+        .section-head p { margin: 5px 0 0; color: var(--subtle); font-size: 12px; }
+        .section-link {
+            border: 0;
+            background: transparent;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 700;
+        }
+        .section-link:hover { color: var(--accent); }
+        .genre-list { display: flex; flex-wrap: wrap; gap: 9px; }
+        .genre-chip {
+            padding: 9px 15px;
+            border: 1px solid var(--line);
+            border-radius: 22px;
+            background: var(--panel);
+            color: #d4d1dc;
+            font-size: 12px;
+            transition: .2s ease;
+        }
+        .genre-chip:hover { border-color: #c6fa5470; background: #c6fa5412; color: var(--accent); }
+        .results-panel, .shelf {
+            overflow: hidden;
+            border: 1px solid #ffffff0d;
+            border-radius: var(--radius);
+            background: #101015;
+        }
+        .results-panel { padding: 19px 20px; }
+        .list:empty { display: none; }
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            min-height: 82px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+        .loading::before {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #ffffff30;
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            content: "";
+            animation: spin .8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        #search-results { margin-top: 0; }
+        .empty {
+            padding: 24px 17px;
+            border: 1px dashed #ffffff1d;
+            border-radius: 12px;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.6;
+            text-align: center;
+        }
+        .row {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            min-width: 0;
+            padding: 10px;
+            border-radius: 11px;
+            transition: background .18s ease;
+        }
+        .row + .row { border-top: 1px solid #ffffff0a; }
+        .row:hover { background: #ffffff08; }
+        .thumb {
+            flex: 0 0 52px;
+            width: 52px;
+            height: 52px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, #282833, #1a1a21);
+            object-fit: cover;
+        }
+        .meta { flex: 1; min-width: 0; }
+        .title {
+            overflow: hidden;
+            color: var(--text);
+            font-size: 13px;
+            font-weight: 700;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .artist { overflow: hidden; margin-top: 4px; color: var(--muted); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+        .play, .like {
+            display: grid;
+            flex: 0 0 auto;
+            width: 36px;
+            height: 36px;
+            place-items: center;
+            border: 1px solid #ffffff18;
+            border-radius: 50%;
+            background: #ffffff08;
+            color: var(--text);
+        }
+        .play:hover { border-color: var(--accent); background: var(--accent); color: var(--accent-ink); }
+        .like { border: 0; background: transparent; color: var(--muted); font-size: 17px; }
+        .like:hover { color: #ff7195; }
+        .shelf-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+        .shelf { min-width: 0; padding: 17px; }
+        .shelf-content { min-height: 60px; }
+        [hidden] { display: none !important; }
+        .shelf-grid:empty { display: none; }
+
+        .video {
+            overflow: hidden;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            border-radius: 12px;
+            background:
+                radial-gradient(circle at 50% 50%, #44403a 0, #27262b 28%, #111116 72%);
+        }
+        .video iframe { width: 100%; height: 100%; border: 0; }
+        .now { min-width: 0; }
+        .now h2 { overflow: hidden; margin: 0 0 5px; font-family: Manrope, sans-serif; font-size: 17px; text-overflow: ellipsis; white-space: nowrap; }
+        .muted { color: var(--muted); font-size: 12px; }
+        .controls { display: flex; align-items: center; justify-content: center; gap: 11px; margin: 17px 0 5px; }
+        .controls button {
+            min-width: 38px;
+            min-height: 38px;
+            padding: 0 10px;
+            border: 1px solid #ffffff18;
+            border-radius: 20px;
+            background: #ffffff08;
+            color: #d5d2dc;
+            font-size: 12px;
+        }
+        .controls button:hover { border-color: #c6fa5460; color: var(--accent); }
+        .controls .primary {
+            width: 48px;
+            height: 48px;
+            border: 0;
+            border-radius: 50%;
+            background: var(--accent);
+            color: var(--accent-ink);
+            font-size: 17px;
+            font-weight: 800;
+        }
+        .controls .primary:hover { color: var(--accent-ink); transform: scale(1.05); }
+        .queue { margin-top: 24px; }
+        .queue-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 4px 12px;
+            padding: 8px;
+        }
+        .queue-list .row { gap: 10px; padding: 8px 5px; }
+        .queue-list .thumb { flex-basis: 42px; width: 42px; height: 42px; }
+        .queue-list .play { width: 30px; height: 30px; font-size: 11px; }
+
+        .bottom {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 20;
+            display: grid;
+            grid-template-columns: minmax(200px, 250px) minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 20px;
+            min-height: 174px;
+            padding: 14px 24px;
+            border-top: 1px solid #ffffff12;
+            background: #111116f5;
+            backdrop-filter: blur(16px);
+        }
+        .bottom .video { width: 100%; min-width: 0; aspect-ratio: 16 / 9; border: 1px solid #ffffff12; }
+        .dock-info { display: flex; min-width: 0; align-items: center; gap: 16px; }
+        .dock-info .thumb { flex: 0 0 48px; width: 48px; height: 48px; }
+        .dock-info .meta { min-width: 0; max-width: 260px; }
+        .dock-controls { display: grid; justify-items: center; gap: 5px; }
+        .dock-controls .controls { margin: 0; }
+        .dock-controls .controls + .controls { gap: 6px; }
+        .dock-controls .controls + .controls button { min-height: 30px; font-size: 10px; }
+
+        .modal { position: fixed; inset: 0; z-index: 50; display: none; place-items: center; padding: 18px; background: #000b; backdrop-filter: blur(8px); }
+        .modal.show { display: grid; }
+        .card {
+            width: min(450px, 100%);
+            padding: 28px;
+            border: 1px solid #ffffff1c;
+            border-radius: 20px;
+            background: #17171d;
+            box-shadow: 0 28px 90px #000b;
+        }
+        .cardhead { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
+        .cardhead h1 { margin: 8px 0 0; font-family: Manrope, sans-serif; font-size: 28px; }
+        .x { border: 0; background: transparent; color: var(--muted); font-size: 25px; }
+        .field { width: 100%; margin: 8px 0; padding: 13px 14px; border: 1px solid var(--line); border-radius: 10px; outline: 0; background: #0e0e13; color: var(--text); }
+        .field:focus { border-color: var(--accent); }
+        .action { width: 100%; margin-top: 12px; padding: 13px; border: 0; border-radius: 10px; background: var(--accent); color: var(--accent-ink); font-weight: 800; }
+        .switch { margin: 14px 12px 0 0; border: 0; background: transparent; color: var(--muted); font-size: 12px; }
+        .switch:hover { color: var(--accent); }
+        .msg { min-height: 18px; margin-top: 12px; color: #ff8b9b; font-size: 12px; }
+
+        @media (max-width: 1180px) {
+            .app { grid-template-columns: 210px minmax(0, 1fr); }
+            .side { padding-right: 12px; padding-left: 12px; }
+            .content { max-width: 930px; }
+            .bottom { grid-template-columns: minmax(180px, 220px) minmax(0, 1fr) auto; gap: 14px; }
+            .dock-info { gap: 10px; }
+            .dock-info .meta { max-width: 180px; }
+        }
+        @media (max-width: 700px) {
+            body { padding-bottom: 0; }
+            .app { display: block; min-height: 100vh; padding-bottom: 220px; }
+            .side {
+                position: fixed;
+                top: auto;
+                right: 0;
+                bottom: 0;
+                left: 0;
+                z-index: 30;
+                height: 62px;
+                overflow: visible;
+                padding: 5px 8px max(5px, env(safe-area-inset-bottom));
+                border: 0;
+                border-top: 1px solid var(--line);
+                background: #101015f7;
+                backdrop-filter: blur(16px);
+            }
+            .brand, .nav-label, .side-note { display: none; }
+            .nav { display: flex; height: 100%; justify-content: space-around; gap: 3px; }
+            .nav button { min-width: 56px; min-height: 50px; flex-direction: column; justify-content: center; gap: 2px; padding: 3px 7px; border-radius: 10px; text-align: center; }
+            .nav-icon { width: auto; font-size: 17px; line-height: 1.1; }
+            .nav button span:last-child { font-size: 9px; }
+            .top { height: auto; min-height: 64px; gap: 9px; padding: 10px 14px; }
+            .history-controls { display: none; }
+            .search { height: 42px; padding-left: 39px; font-size: 13px; }
+            .search-icon { left: 13px; }
+            .search-action { height: 34px; padding: 0 10px; font-size: 11px; }
+            .signin { padding: 9px 12px; font-size: 10px; }
+            .content { padding: 18px 14px 25px; }
+            .hero { min-height: 235px; padding: 26px 22px; border-radius: 18px; }
+            .hero h1 { font-size: clamp(34px, 10vw, 48px); }
+            .hero p { max-width: 350px; font-size: 13px; }
+            .hero::after { right: -110px; }
+            .section { margin-top: 26px; }
+            .genre-list { gap: 7px; }
+            .genre-chip { padding: 8px 12px; font-size: 11px; }
+            .shelf-grid { grid-template-columns: 1fr; gap: 10px; }
+            .results-panel { padding: 14px 10px; }
+            .row { gap: 9px; padding: 9px 6px; }
+            .thumb { flex-basis: 46px; width: 46px; height: 46px; }
+            .title { font-size: 12px; }
+            .artist { font-size: 10px; }
+            .play, .like { width: 34px; height: 34px; }
+            .bottom {
+                bottom: 62px;
+                grid-template-columns: minmax(88px, 112px) minmax(0, 1fr);
+                grid-template-rows: 1fr;
+                gap: 8px 11px;
+                min-height: 0;
+                padding: 9px 12px;
+            }
+            .bottom .video { align-self: center; }
+            .dock-info { align-items: center; gap: 0; }
+            .dock-info .thumb { display: none; }
+            .dock-info .meta { max-width: 100%; }
+            .dock-info .now h2 { font-size: 13px; }
+            .dock-info .muted { font-size: 10px; }
+            .dock-controls { grid-column: 2; display: flex; justify-content: space-between; gap: 3px; }
+            .dock-controls .controls { gap: 2px; }
+            .dock-controls .controls button { min-width: 38px; min-height: 38px; padding: 0 5px; border: 0; background: transparent; font-size: 10px; }
+            .dock-controls .controls .primary { width: 38px; height: 38px; min-width: 38px; min-height: 38px; background: var(--accent); font-size: 14px; }
+            .dock-controls .controls + .controls { gap: 1px; }
+            .dock-controls .controls + .controls button { min-height: 36px; padding: 0 4px; font-size: 9px; }
+        }
+        @media (max-width: 390px) {
+            .bottom { grid-template-columns: 100px minmax(0, 1fr); gap: 7px; padding-right: 8px; padding-left: 8px; }
+            .dock-controls .controls { gap: 0; }
+            .dock-controls .controls + .controls button { padding: 0 2px; font-size: 8px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <aside class="side" aria-label="Main navigation">
+            <div class="brand">
+                <div class="mark" aria-hidden="true">OT</div>
+                <div><span class="brand-name">OPENTUNE</span><span class="brand-caption">Created by Himanshu Dhakad</span></div>
+            </div>
+            <div class="nav-label">Discover</div>
+            <nav class="nav">
+                <button class="active" onclick="showHome()"><span class="nav-icon">⌂</span><span>Home</span></button>
+                <button onclick="focusSearch()"><span class="nav-icon">⌕</span><span>Search</span></button>
+            </nav>
+            <div class="nav-label">Your library</div>
+            <nav class="nav">
+            <button aria-label="Liked music" title="Liked music" onclick="showLibrary('likes')"><span class="nav-icon">♡</span><span>Likes</span></button>
+            <button aria-label="Recently played" title="Recently played" onclick="showLibrary('history')"><span class="nav-icon">◷</span><span>History</span></button>
+            </nav>
+        </aside>
+
+        <main class="main">
+            <header class="top">
+                <div class="history-controls">
+                    <button class="round-btn" type="button" aria-label="Go back" onclick="history.back()">‹</button>
+                    <button class="round-btn" type="button" aria-label="Go forward" onclick="history.forward()">›</button>
+                </div>
+                <div class="search-wrap">
+                    <span class="search-icon" aria-hidden="true">⌕</span>
+                    <input id="search" class="search" type="search" placeholder="What do you want to listen to?" autocomplete="off" aria-label="Search songs and artists">
+                    <button class="search-action" type="button" onclick="doSearch()">Search</button>
+                </div>
+                <button class="signin" id="signin" type="button" onclick="openAuth()">SIGN IN</button>
+            </header>
+
+            <div class="content" id="home">
+                <section class="section" id="search-results" aria-label="Search results">
+                    <div id="list" class="list" aria-live="polite"></div>
+                </section>
+
+                <section class="section queue" id="queueSection" hidden>
+                    <div class="results-panel queue-list" id="queueList"></div>
+                </section>
+
+                <section class="section" id="librarySections" aria-label="Your music library" hidden>
+                    <div class="empty" id="libraryError" role="alert" hidden></div>
+                    <div class="shelf-grid">
+                        <article class="shelf" id="recentShelf" hidden>
+                            <div class="shelf-content" id="recentList"></div>
+                        </article>
+                        <article class="shelf" id="likedShelf" hidden>
+                            <div class="shelf-content" id="likedList"></div>
+                        </article>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <footer class="bottom" aria-label="Playback controls">
+        <div class="video" id="video"><div style="height:100%;display:grid;place-items:center;color:#aaa8b4;font-size:11px;letter-spacing:.12em">SELECT A SONG TO PLAY</div></div>
+        <div class="dock-info">
+            <div class="thumb" id="bottomThumb" aria-hidden="true"></div>
+            <div class="meta">
+                <div class="eyebrow">NOW PLAYING</div>
+                <div class="now"><h2 id="nowTitle">Nothing playing</h2><div id="nowArtist" class="muted">Choose a track to get started</div></div>
+            </div>
+        </div>
+        <div class="dock-controls">
+            <div class="controls">
+                <button type="button" aria-label="Previous track" onclick="prev()">|◀</button>
+                <button class="primary" id="mainPlay" type="button" aria-label="Play" onclick="togglePlay()">▶</button>
+                <button type="button" aria-label="Next track" onclick="next()">▶|</button>
+            </div>
+            <div class="controls">
+                <button type="button" aria-label="Shuffle queue" onclick="shuffleQueue()">⇄ SHUFFLE</button>
+                <button type="button" onclick="toggleRepeat()" id="repeat">↻ REPEAT: OFF</button>
+            </div>
+        </div>
+    </footer>
+
+    <div class="modal" id="auth" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+        <div class="card">
+            <div class="cardhead">
+                <div><div class="eyebrow">OPENTUNE ACCOUNT</div><h1 id="authTitle">Sign in</h1></div>
+                <button class="x" type="button" aria-label="Close" onclick="closeAuth()">×</button>
+            </div>
+            <input id="username" class="field" autocomplete="username" placeholder="Username">
+            <input id="password" class="field" type="password" autocomplete="current-password" placeholder="Password">
+            <div id="recoveryWrap" style="display:none"><input id="recovery" class="field" placeholder="Recovery answer — what was your first love?"></div>
+            <button class="action" type="button" onclick="submitAuth()" id="authAction">SIGN IN</button>
+            <button class="switch" type="button" onclick="switchAuth()" id="switchAuth">Create an account</button>
+            <button class="switch" type="button" onclick="forgot()">Forgot password?</button>
+            <div id="authMsg" class="msg" role="status"></div>
+        </div>
+    </div>
+
+    <script>
+        let state={results:[],queue:[],index:-1,repeat:false,shuffle:false,playing:false,token:localStorage.getItem('opentune_token')||''};
+        const $=id=>document.getElementById(id);
+        let searchRequest=0;
+        function focusSearch(){$('search').focus()}
+        function showHome(){
+            $('home').scrollIntoView({behavior:'smooth'});
+            document.querySelectorAll('.nav button').forEach(button=>button.classList.toggle('active',button.textContent.includes('Home')));
+        }
+        function searchFor(query){$('search').value=query;doSearch()}
+        let timer;
+        function doSearch(){
+            let q=$('search').value.trim();
+            clearTimeout(timer);
+            let request=++searchRequest;
+            if(!q){
+                state.results=[];
+                $('list').replaceChildren();
+                return;
+            }
+            timer=setTimeout(async()=>{
+                $('list').className='list';
+                $('list').innerHTML='<div class="loading" role="status">Searching…</div>';
+                try{
+                    let r=await fetch('/api/search?q='+encodeURIComponent(q));
+                    let d=await r.json();
+                    if(!r.ok)throw Error(d.error||'Search failed');
+                    if(request!==searchRequest)return;
+                    state.results=Array.isArray(d.results)?d.results:[];
+                    renderResults();
+                    $('search-results').scrollIntoView({behavior:'smooth',block:'start'});
+                }catch(e){
+                    if(request!==searchRequest)return;
+                    state.results=[];
+                    $('list').innerHTML='<div class="empty" role="alert">Search failed: '+esc(e.message)+'</div>';
+                }
+            },250)
+        }
+        $('search').addEventListener('keydown',e=>{if(e.key==='Enter')doSearch()});
+        function renderResults(){
+            $('list').innerHTML=state.results.length?state.results.map((x,i)=>`<div class="row"><img class="thumb" src="${esc(x.thumbnail||'')}" alt="" onerror="this.style.visibility='hidden'"><div class="meta"><div class="title">${esc(x.title)}</div><div class="artist">${esc(x.artist)} · ${esc(x.duration||'')}</div></div><button class="like" aria-label="Like ${esc(x.title)}" title="Save to liked music" onclick="likeAt(${i})">♡</button><button class="play" aria-label="Play ${esc(x.title)}" onclick="playAt(${i})">▶</button></div>`).join(''):'<div class="empty">No results found. Try another title or artist.</div>'
+        }
+        function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+        function playAt(i){state.queue=[...state.results];state.index=i;playCurrent()}
+        function playCurrent(){
+            let x=state.queue[state.index];
+            if(!x)return;
+            $('video').innerHTML=`<iframe title="YouTube player for ${esc(x.title)}" src="https://www.youtube.com/embed/${encodeURIComponent(x.videoId)}?autoplay=1&rel=0&enablejsapi=1&origin=${encodeURIComponent(location.origin)}" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
+            $('nowTitle').textContent=x.title;
+            $('nowArtist').textContent=x.artist;
+            $('bottomThumb').style.backgroundImage=x.thumbnail?`url("${x.thumbnail.replace(/["\\]/g,'')}")`:'';
+            $('bottomThumb').style.backgroundSize='cover';
+            state.playing=true;
+            updatePlayButton();
+            renderQueue();
+            if(state.token)fetch('/api/history',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+state.token},body:JSON.stringify(x)}).then(r=>{if(!r.ok)throw Error('Could not save listening history');loadHomeSections()}).catch(e=>console.error(e));
+        }
+        function updatePlayButton(){
+            $('mainPlay').textContent=state.playing?'Ⅱ':'▶';
+            $('mainPlay').setAttribute('aria-label',state.playing?'Pause':'Play');
+        }
+        function renderQueue(){
+            let queue=$('queueList');
+            let upcoming=state.queue.slice(state.index+1).slice(0,15);
+            queue.innerHTML=upcoming.map((x,j)=>`<div class="row"><img class="thumb" src="${esc(x.thumbnail||'')}" alt="" onerror="this.style.visibility='hidden'"><div class="meta"><div class="title">${esc(x.title)}</div><div class="artist">${esc(x.artist)}</div></div><button class="play" aria-label="Play ${esc(x.title)} next" onclick="state.index=${state.index+1+j};playCurrent()">▶</button></div>`).join('');
+            $('queueSection').hidden=upcoming.length===0;
+        }
+        function next(){if(!state.queue.length)return;if(state.repeat){playCurrent();return}if(state.index<state.queue.length-1){state.index++;playCurrent()}}
+        function prev(){if(state.index>0){state.index--;playCurrent()}}
+        function togglePlay(){
+            let frame=$('video').querySelector('iframe');
+            if(!frame)return;
+            state.playing=!state.playing;
+            let command=state.playing?'playVideo':'pauseVideo';
+            frame.contentWindow.postMessage(JSON.stringify({event:'command',func:command,args:[]}),'*');
+            updatePlayButton();
+        }
+        function toggleRepeat(){state.repeat=!state.repeat;$('repeat').textContent='↻  REPEAT: '+(state.repeat?'ON':'OFF')}
+        function shuffleQueue(){if(!state.queue.length)return;let cur=state.queue[state.index];let rest=state.queue.filter((_,i)=>i!==state.index).sort(()=>Math.random()-.5);state.queue=cur?[cur,...rest]:rest;state.index=0;renderQueue()}
+        function openAuth(){$('auth').classList.add('show');$('authMsg').textContent='';$('username').focus()}
+        function closeAuth(){$('auth').classList.remove('show')}
+        let signup=false;
+        function switchAuth(){
+            signup=!signup;
+            $('authTitle').textContent=signup?'Create account':'Sign in';
+            $('authAction').textContent=signup?'CREATE ACCOUNT':'SIGN IN';
+            $('switchAuth').textContent=signup?'Already have an account? Sign in':'Create an account';
+            $('recoveryWrap').style.display=signup?'block':'none';
+            $('password').autocomplete=signup?'new-password':'current-password'
+        }
+        async function submitAuth(){
+            let username=$('username').value.trim(),password=$('password').value,recovery=$('recovery').value;
+            if(!username||!password||(signup&&!recovery))return $('authMsg').textContent='Fill in all required fields.';
+            let endpoint=signup?'/api/auth/register':'/api/auth/login';
+            try{
+                let r=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,password,recovery})});
+                let d=await r.json();
+                if(!r.ok)return $('authMsg').textContent=d.error||'Request failed';
+                state.token=d.token;
+                localStorage.setItem('opentune_token',d.token);
+                closeAuth();
+                $('signin').textContent=d.username||username;
+                loadHomeSections();
+            }catch(e){$('authMsg').textContent='Could not connect. Please try again.';console.error(e)}
+        }
+        async function forgot(){
+            let username=prompt('Username');
+            if(!username)return;
+            let recovery=prompt('Recovery answer');
+            if(!recovery)return;
+            let password=prompt('New password');
+            if(!password)return;
+            try{
+                let r=await fetch('/api/auth/reset',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username,recovery,password})});
+                let d=await r.json();
+                alert(d.error||'Password reset. You can sign in now.')
+            }catch(e){alert('Could not connect. Please try again.');console.error(e)}
+        }
+        function libraryTrack(x){return {videoId:x.video_id||x.videoId,title:x.title,artist:x.artist,thumbnail:x.thumbnail||''}}
+        function renderShelf(container,items){
+            let shelf=$(container);
+            shelf.innerHTML=items.slice(0,3).map((raw,i)=>{
+                let x=libraryTrack(raw);
+                return `<div class="row"><img class="thumb" src="${esc(x.thumbnail)}" alt="" onerror="this.style.visibility='hidden'"><div class="meta"><div class="title">${esc(x.title)}</div><div class="artist">${esc(x.artist)}</div></div><button class="play" aria-label="Play ${esc(x.title)}" onclick="playLibraryItem('${container}',${i})">▶</button></div>`
+            }).join('');
+            $(container==='recentList'?'recentShelf':'likedShelf').hidden=items.length===0;
+            $('librarySections').hidden=!window.recentItems.length&&!window.likedItems.length;
+        }
+        function playLibraryItem(container,index){
+            let items=container==='recentList'?window.recentItems:window.likedItems;
+            state.results=items.map(libraryTrack);
+            playAt(index)
+        }
+        window.recentItems=[];
+        window.likedItems=[];
+        async function loadHomeSections(){
+            if(!state.token)return;
+            try{
+                let headers={Authorization:'Bearer '+state.token};
+                let [historyResponse,likesResponse]=await Promise.all([fetch('/api/history',{headers}),fetch('/api/likes',{headers})]);
+                if(!historyResponse.ok||!likesResponse.ok)throw Error('Could not load your music library.');
+                let [historyData,likesData]=await Promise.all([historyResponse.json(),likesResponse.json()]);
+                window.recentItems=historyData.history||[];
+                window.likedItems=likesData.likes||[];
+                $('libraryError').hidden=true;
+                $('libraryError').textContent='';
+                renderShelf('recentList',window.recentItems);
+                renderShelf('likedList',window.likedItems);
+            }catch(e){
+                $('libraryError').textContent='Could not load your library: '+e.message;
+                $('libraryError').hidden=false;
+                $('librarySections').hidden=false;
+                console.error(e)
+            }
+        }
+        async function showLibrary(type){
+            if(!state.token)return openAuth();
+            try{
+                let r=await fetch('/api/'+type,{headers:{Authorization:'Bearer '+state.token}});
+                let d=await r.json();
+                if(!r.ok)throw Error(d.error||'Could not load library');
+                state.results=(d[type]||[]).map(libraryTrack);
+                renderResults();
+                $('search-results').scrollIntoView({behavior:'smooth',block:'start'});
+            }catch(e){$('list').innerHTML='<div class="empty">'+esc(e.message)+'</div>'}
+        }
+        function likeAt(i){
+            if(!state.token)return openAuth();
+            let track=state.results[i];
+            if(!track)return;
+            fetch('/api/likes',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+state.token},body:JSON.stringify(track)})
+                .then(async r=>{let d=await r.json();if(!r.ok)throw Error(d.error||'Could not save song');return d})
+                .then(()=>{loadHomeSections()})
+                .catch(e=>{console.error(e);alert(e.message)})
+        }
+        function setActiveNav(button){
+            document.querySelectorAll('.nav button').forEach(item=>item.classList.remove('active'));
+            if(button)button.classList.add('active')
+        }
+        document.querySelectorAll('.nav button').forEach(button=>button.addEventListener('click',()=>setActiveNav(button)));
+        if(state.token){$('signin').textContent='MY ACCOUNT';loadHomeSections()}
+    </script>
+</body>
+</html>
